@@ -33,7 +33,7 @@ app.use(
     response_type: 'code id_token',
     response_mode: 'form_post',
     audience: process.env.API_AUDIENCE,
-    scope: 'openid profile email read:reports offline_access'
+    scope: 'openid profile email read:reports read:appointments read:messages offline_access'
   },
   handleCallback: async function (req, res, next) {
     req.session.openidTokens = req.openidTokens;
