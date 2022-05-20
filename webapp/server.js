@@ -61,7 +61,7 @@ app.get("/user", requiresAuth(), (req, res) => {
   res.render("user", { user: req.openid && req.openid.user });
 });
 
-app.get("/expenses", requiresAuth(), async (req, res, next) => {
+app.get("/reports", requiresAuth(), async (req, res, next) => {
   try {
     let tokenSet = req.openid.makeTokenSet(req.session.openidTokens);
     if (tokenSet.expired()) {
@@ -69,14 +69,14 @@ app.get("/expenses", requiresAuth(), async (req, res, next) => {
       tokenSet.refresh_token = req.session.openidTokens.refresh_token;
       req.session.openidTokens = tokenSet;
     }
-    const expenses = await request(process.env.API_URL, {
+    const reports = await request(process.env.API_URL, {
       headers: { authorization: "Bearer " + tokenSet.access_token },
       json: true
     });
-
-    res.render("expenses", {
+    console.log(reports);
+    res.render("reports", {
       user: req.openid && req.openid.user,
-      expenses,
+      reports,
     });
   } catch (err) {
     next(err);

@@ -7,23 +7,23 @@
   <title>Identity Labs</title>
 </head>
 <body>
-<h1>Expenses Report</h1>
+<h1>Management API Report</h1>
 <p><a href="/">Home</a></p>
-<p>Hello, <%= user.name %>. These are your expenses:</p>
+
+<p>Hello, <%= user.name %>. These are your Applications and their associated Actions:</p>
 <table border="1">
   <tr>
-    <% Object.keys(expenses[0]).forEach(k => { %>
+    <% Object.keys(reports[0]).forEach(k => { %>
       <th><strong><%= k %></strong></th>
     <% }) %>
   </tr>
-  <% expenses.forEach(expense => { %>
+  <% reports.forEach(report => { %>
     <tr>
-      <% Object.keys(expense).forEach(k => { %>
-        <td><%= expense[k] %></td>
+      <% Object.keys(report).forEach(k => { %>
+        <td><%= report[k] %></td>
       <% }) %>
     </tr>
   <% }) %>
 </table>
-<p>Don't spend too much.</p>
 </body>
 </html>
