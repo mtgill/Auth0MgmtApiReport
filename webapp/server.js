@@ -33,7 +33,7 @@ app.use(
     response_type: 'code id_token',
     response_mode: 'form_post',
     audience: process.env.API_AUDIENCE,
-    scope: 'openid profile email read:reports offline_access'
+    scope: 'openid profile email read:reports read:appointments read:messages offline_access'
   },
   handleCallback: async function (req, res, next) {
     req.session.openidTokens = req.openidTokens;
@@ -57,10 +57,6 @@ app.get("/", (req, res) => {
   res.render("home", { user: req.openid && req.openid.user });
 });
 
-app.get("/user", requiresAuth(), (req, res) => {
-  res.render("user", { user: req.openid && req.openid.user });
-});
-
 app.get("/reports", requiresAuth(), async (req, res, next) => {
   try {
     let tokenSet = req.openid.makeTokenSet(req.session.openidTokens);
@@ -73,7 +69,6 @@ app.get("/reports", requiresAuth(), async (req, res, next) => {
       headers: { authorization: "Bearer " + tokenSet.access_token },
       json: true
     });
-    console.log(reports);
     res.render("reports", {
       user: req.openid && req.openid.user,
       reports,

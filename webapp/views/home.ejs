@@ -4,14 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Identity Labs</title>
+  <title>Auth0 Management API Report</title>
 </head>
 <body>
-<h1>Home Page</h1>
+<h1>Auth0 Management API Report</h1>
 <% if(locals.user) {%>
-  <p>Hello <%= user.name %></p>
-  <a href="/reports">Report</a>
+  <h3>Hello <%= user.name %></h3>
+  <a href="/reports">View Report</a>
   <a href="/logout">Logout</a>
+<h3>User Information</h3>
+  <ul>
+<% Object.keys(user).forEach(k => { %>
+  <li><strong><%= k%></strong>: <%= user[k] %></li>
+<% }); %>
+</ul>
 <% } else { %>
   <a href="/login">Login</a>
 <% } %>

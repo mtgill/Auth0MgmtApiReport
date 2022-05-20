@@ -1,71 +1,97 @@
-require('dotenv').config();
+const dotenv = require('dotenv')
 const express = require('express');
-const { auth, requiredScopes } = require('express-oauth2-bearer');
 const http = require('http');
 const axios = require('axios').default
-
-const appUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
+const jwt = require("express-jwt");
+const jwksRsa = require("jwks-rsa");
+const cors = require('cors');
 
 const app = express();
-app.use(auth());
+dotenv.config()
+app.use(express.json())
+app.use(cors())
 
+// Build config
+const PORT = process.env.PORT || 8080;
+const DOMAIN = process.env.DOMAIN
+const CLIENT_ID = process.env.CLIENT_ID
+const CLIENT_SECRET = process.env.CLIENT_SECRET
+const AUDIENCE = process.env.ALLOWED_AUDIENCES
 
-let clientObjList = [];
-async function loadMgmtAPIData() { //Might need to add API Token param back in
-  try {
-    const mgmtToken = process.env.API_KEY;
-    
-    const allClients = await axios.get('https://dev-xmsvtht0.us.auth0.com/api/v2/clients', {
-      //method: 'GET',
-      headers: { authorization: 'Bearer ' + mgmtToken }
-    }).then((res) => {
-      return res.data;
-    });
+// Validates JWT
+const authorizeAccessToken = jwt.expressjwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `https://${DOMAIN}/.well-known/jwks.json`
+  }),
+  audience: `${AUDIENCE}`,
+  issuer: `https://${DOMAIN}/`,
+  algorithms: ["RS256"]
+});
 
-    const allActions = await axios.get('https://dev-xmsvtht0.us.auth0.com/api/v2/actions/actions', {
-      //method: 'GET',
-      headers: { authorization: 'Bearer ' + mgmtToken }
-    }).then((res) => {
-      // res.forEach(action => {
+app.use(authorizeAccessToken);
 
-      // })
-     // console.log(res.data);
-      return res.data;
-    });
+app.get('/', authorizeAccessToken, async (req, res) => {
 
-    const actions = allActions;
-    matchActionsAndClients(allClients, allActions);
-    //console.log("clientObjList", clientObjList.length);
-  } catch (err) {
-    console.log(err);
+  // Formatting request for Management API token
+  let options = {
+    method: `POST`,
+    url: `https://${DOMAIN}/oauth/token`,
+    headers: {'content-type': 'application/json'},
+    data: {
+        grant_type: 'client_credentials',
+        client_id: `${CLIENT_ID}`,
+        client_secret: `${CLIENT_SECRET}`,
+        audience: `https://${DOMAIN}/api/v2/`
+    }
   }
-}
+  // Requesting Management API token
+  const mgmtApiToken = await axios.request(options).then((res) => {
+      return `Bearer ${res.data.access_token}`
+  })
 
-const matchActionsAndClients = (clients, actions) => {
-  clients.forEach(client => {
-    const singleClient = {name: client.name, id: client.client_id, actions: []};
-    clientObjList.push(singleClient);
+  // Retrieve all Clients in tenant
+  const allClients = await axios.get(`https://${DOMAIN}/api/v2/clients`, {
+    headers: { authorization: mgmtApiToken }
+  }).then((res) => {
+    return res.data;
   });
-  for (let i = 0; i < actions.total; i++){
-    clientObjList.forEach(client => {
-      if (actions.actions[i].code.includes(client.id)){
-        //console.log("actions console log", actions.actions[i]);
-        client.actions.push(actions.actions[i].name, actions.actions[i].id, actions.actions[i].supported_triggers[0].id);
-      }
-    })
+
+  // Retrieve all Actions in tenant
+  const allActions = await axios.get(`https://${DOMAIN}/api/v2/actions/actions`, {
+    headers: { authorization: mgmtApiToken }
+  }).then((res) => {
+    return res.data;
+  });
+
+  let clientObjList = [];
+  
+  // Match Actions with their Clients
+  const matchActionsAndClients = (clients, actions) => {
+    clients.forEach(client => {
+      const singleClient = {name: client.name, id: client.client_id, actions: []};
+      clientObjList.push(singleClient);
+    });
+    for (let i = 0; i < actions.total; i++){
+      clientObjList.forEach(client => {
+        if (actions.actions[i].code.includes(client.id)){
+          client.actions.push(actions.actions[i].name, actions.actions[i].id, actions.actions[i].supported_triggers[0].id);
+        }
+      })
+    }
   }
-  console.log("clientObjList", clientObjList);
-}
+  matchActionsAndClients(allClients, allActions);
 
-
-app.get('/', requiredScopes('read:reports'), (req, res) => {
-  loadMgmtAPIData();
+  // Return list of Clients and their matching Actions
   res.send(
     clientObjList
   );
+  // Clear clientObjList in case the page is reloaded
   clientObjList = [];
 });
 
-http.createServer(app).listen(process.env.PORT, () => {
-  console.log(`listening on ${appUrl}`);
+http.createServer(app).listen(PORT, () => {
+  console.log(`listening on ${PORT}`);
 });
