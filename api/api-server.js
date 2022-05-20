@@ -3,6 +3,9 @@ const express = require('express');
 const { auth, requiredScopes } = require('express-oauth2-bearer');
 const http = require('http');
 const axios = require('axios').default
+const jwt = require("express-jwt");
+const jwksRsa = require("jwks-rsa");
+const jwtAuthz = require("express-jwt-authz");
 
 const appUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
 
@@ -11,31 +14,23 @@ app.use(auth());
 
 
 let clientObjList = [];
-async function loadMgmtAPIData() { //Might need to add API Token param back in
+async function loadMgmtAPIData() { 
   try {
     const mgmtToken = process.env.API_KEY;
     
-    const allClients = await axios.get('https://dev-xmsvtht0.us.auth0.com/api/v2/clients', {
-      //method: 'GET',
+    const allClients = await axios.get(`${process.env.ISSUER_BASE_URL}/api/v2/clients`, {
       headers: { authorization: 'Bearer ' + mgmtToken }
     }).then((res) => {
       return res.data;
     });
 
-    const allActions = await axios.get('https://dev-xmsvtht0.us.auth0.com/api/v2/actions/actions', {
-      //method: 'GET',
+    const allActions = await axios.get(`${process.env.ISSUER_BASE_URL}/api/v2/actions/actions`, {
       headers: { authorization: 'Bearer ' + mgmtToken }
     }).then((res) => {
-      // res.forEach(action => {
-
-      // })
-     // console.log(res.data);
       return res.data;
     });
 
-    const actions = allActions;
     matchActionsAndClients(allClients, allActions);
-    //console.log("clientObjList", clientObjList.length);
   } catch (err) {
     console.log(err);
   }
@@ -49,7 +44,6 @@ const matchActionsAndClients = (clients, actions) => {
   for (let i = 0; i < actions.total; i++){
     clientObjList.forEach(client => {
       if (actions.actions[i].code.includes(client.id)){
-        //console.log("actions console log", actions.actions[i]);
         client.actions.push(actions.actions[i].name, actions.actions[i].id, actions.actions[i].supported_triggers[0].id);
       }
     })
@@ -57,8 +51,24 @@ const matchActionsAndClients = (clients, actions) => {
   console.log("clientObjList", clientObjList);
 }
 
+// const authorizeAccessToken = jwt.expressjwt({
+//   secret: jwksRsa.expressJwtSecret({
+//     cache: true,
+//     rateLimit: true,
+//     jwksRequestsPerMinute: 5,
+//     jwksUri: `${process.env.ISSUER_BASE_URL}/.well-known/jwks.json`
+//   }),
+//   audience: process.env.ALLOWED_AUDIENCES,
+//   issuer: `${process.env.ISSUER_BASE_URL}/`,
+//   algorithms: ["RS256"]
+// });
 
-app.get('/', requiredScopes('read:reports'), (req, res) => {
+// const checkPermissions = jwtAuthz(["read:reports", "read:appointments"], {
+//   customScopeKey: "permissions",
+//   checkAllScopes: true
+// });
+
+app.get('/', /*authorizeAccessToken, checkPermissions,*/ (req, res) => {
   loadMgmtAPIData();
   res.send(
     clientObjList

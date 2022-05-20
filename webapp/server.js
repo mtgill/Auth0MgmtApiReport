@@ -64,6 +64,7 @@ app.get("/user", requiresAuth(), (req, res) => {
 app.get("/reports", requiresAuth(), async (req, res, next) => {
   try {
     let tokenSet = req.openid.makeTokenSet(req.session.openidTokens);
+    console.log(tokenSet);
     if (tokenSet.expired()) {
       tokenSet = await req.openid.client.refresh(tokenSet);
       tokenSet.refresh_token = req.session.openidTokens.refresh_token;
@@ -73,7 +74,6 @@ app.get("/reports", requiresAuth(), async (req, res, next) => {
       headers: { authorization: "Bearer " + tokenSet.access_token },
       json: true
     });
-    console.log(reports);
     res.render("reports", {
       user: req.openid && req.openid.user,
       reports,
@@ -84,6 +84,7 @@ app.get("/reports", requiresAuth(), async (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log("THE ERROR IS HERE ")
   console.error(err.stack);
   res.status(500).send(err);
 });
