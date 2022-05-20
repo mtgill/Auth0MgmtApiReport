@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Identity Labs</title>
+</head>
+<body>
+<h1>Management API Report</h1>
+<p><a href="/">Home</a></p>
+
+<p>Hello, <%= user.name %>. These are your Applications and their associated Actions:</p>
+<table border="1">
+  <tr>
+    <% Object.keys(reports[0]).forEach(k => { %>
+      <th><strong><%= k %></strong></th>
+    <% }) %>
+  </tr>
+  <% reports.forEach(report => { %>
+    <tr>
+      <% Object.keys(report).forEach(k => { %>
+        <td><%= report[k] %></td>
+      <% }) %>
+    </tr>
+  <% }) %>
+</table>
+</body>
+</html>
