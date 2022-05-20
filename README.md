@@ -2,22 +2,22 @@
 A web application and API that work together to generate a report of a tenants Clients and Actions. 
 
 ## Setup
-1. This application uses an Express API that makes calls to Auth0 API's. If you already have an Auth0 API that you'd like to use, move on to step 2. Otherwise information on setting up a new Auth0 API can be found [here](https://auth0.com/docs/quickstart/backend/nodejs). 
+1. This application uses an Express API that makes calls to Auth0 API's. If you already have an Auth0 API that you'd like to use, move on to step 2. Otherwise information on setting up a new Auth0 API can be found [here](https://auth0.com/docs/quickstart/backend/nodejs). If you're creating a new API, go ahead and Enable RBAC, Add Permissions in the Access Token, and Allow Offline Access. 
 
-2. You will also need to create or select an Auth0 Regular Web Application, and information on how to create a new application can be found [here](https://auth0.com/docs/get-started/auth0-overview/create-applications/regular-web-apps)
+2. You will also need to create or select an Auth0 Regular Web Application, and information on how to create a new application can be found [here](https://auth0.com/docs/get-started/auth0-overview/create-applications/regular-web-apps). Make sure to configure the Allowed Callback and Logout URL's if you're creating a new application.
 
-3. Once you've selected an existing or created a new Auth0 API, the next step is to fork this repository and clone a local copy down to your machine. This repository will contain two directories, a .gitignore, and this README document. 
+3. Once you've selected existing or created a new Auth0 API and Web Application, the next step is to fork this repository and clone a local copy down to your machine. This repository will contain two directories, a .gitignore, and this README document. 
 
 4. Using your terminal, move to the api directory using `cd api`, and then run `npm install` to install all required modules. You will also need to create a .env file, and a sample has been provided for you. To easily copy the sample run `cp .env-sample .env`. We'll cover exactly what goes into the .env file in a later step. Keep this terminal window open as we'll need to use it later.
 
 5. Open a new terminal window and navigate to the root of this project, and this time move into the webapp directory. Repeat the steps from step 4 to install the required modules and create a new .env file. Keep this terminal window open as well as we'll need to use it later.
 
 **NOTE**
-If you are going to share your local version of this project it critical that the .env files are included in the .gitignore as they contain sensitive information. This project *should* take care of this for you but it's a good idea to always double check. 
+If you are going to share your local version of this project it is critical that the .env files are included in the .gitignore as they contain sensitive information. This project *should* take care of this for you but it's a good idea to always double check. 
 
-6. Open your newly created api/.env file and fill in the values which can be found in the Auth0 dashboard by going to Applications => APIs => {The API you selected or created in step 1} => Machine to Machine Applications. Select the correct application and navigate to its Settings tab, this will have your DOMAIN, CLIENT_ID, and CLIENT_SECRET. **This is also a good time to confirm that your Machine to Machine app has the correct permissions, I'd start with read:reports and read:clients**  The PORT can be an open port of your choosing, or it will default to 8080. Set ALLOWED_AUDIENCES to your API's identifier which can be found in the General Settings menu. 
+6. Open your newly created api/.env file and fill in the values which can be found in the Auth0 dashboard by going to Applications => APIs => {The API you selected or created in step 1} => Machine to Machine Applications. Select the correct application and navigate to its Settings tab, this will have your DOMAIN, CLIENT_ID, and CLIENT_SECRET. **This is also a good time to confirm that your Machine to Machine app has the correct permissions, I'd start with read:reports and read:clients**  The PORT can be an open port of your choosing, or it will default to 8080. Set ALLOWED_AUDIENCES to your API's identifier which can be found in the General Settings menu. Save this file once complete
 
-7. Now open the webapp/.env file and add the appropriate values. The ISSUER_BASE_URL is the Domain, API_URL is the route that you want to access the Express API from, APP_SESSION_SECRET can be any long (100+ char) string, PORT is the port that you'd like the application to run on, and API_AUDIENCE is your API's identifier. CLIENT_ID and CLIENT_SECRET can be found in the Basic Information section of your web applications Settings tab.
+7. Now open the webapp/.env file and add the appropriate values. The ISSUER_BASE_URL is the Domain, API_URL is the route that you want to access the Express API from, APP_SESSION_SECRET can be any long (100+ char) string, PORT is the port that you'd like the application to run on, and API_AUDIENCE is your API's identifier. CLIENT_ID and CLIENT_SECRET can be found in the Basic Information section of your web applications Settings tab. Save this file once complete.
 
 8. Navigate back to the terminal window where you're inside of the api directory, and start the server using `npm start`. Switch to the terminal for the webbapp directory and start the application using `npm start`. 
 
