@@ -7,14 +7,13 @@
   <title>Auth0 Management API Report</title>
 </head>
 <body>
-<h1>Home Page</h1>
+<h1>Auth0 Management API Report</h1>
 <% if(locals.user) {%>
-  <ul>
   <h3>Hello <%= user.name %></h3>
-  <a href="/reports">Report</a>
-  <a href="/user">User Information</a>
+  <a href="/reports">View Report</a>
   <a href="/logout">Logout</a>
-</ul>
+<h3>User Information</h3>
+  <ul>
 <% Object.keys(user).forEach(k => { %>
   <li><strong><%= k%></strong>: <%= user[k] %></li>
 <% }); %>

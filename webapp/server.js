@@ -57,14 +57,9 @@ app.get("/", (req, res) => {
   res.render("home", { user: req.openid && req.openid.user });
 });
 
-app.get("/user", requiresAuth(), (req, res) => {
-  res.render("user", { user: req.openid && req.openid.user });
-});
-
 app.get("/reports", requiresAuth(), async (req, res, next) => {
   try {
     let tokenSet = req.openid.makeTokenSet(req.session.openidTokens);
-    console.log(tokenSet);
     if (tokenSet.expired()) {
       tokenSet = await req.openid.client.refresh(tokenSet);
       tokenSet.refresh_token = req.session.openidTokens.refresh_token;
@@ -84,7 +79,6 @@ app.get("/reports", requiresAuth(), async (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log("THE ERROR IS HERE ")
   console.error(err.stack);
   res.status(500).send(err);
 });
