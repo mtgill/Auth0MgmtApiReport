@@ -1,5 +1,5 @@
 # Auth0 Management Api Report
-A web application and API that work together to generate a report of a tenants Clients and Actions. 
+A web application and API that work together to generate a report of a tenant's Clients and Actions. 
 
 ## Setup
 1. This application uses an Express API that makes calls to Auth0 API's. If you already have an Auth0 API that you'd like to use, move on to step 2. Otherwise information on setting up a new Auth0 API can be found [here](https://auth0.com/docs/quickstart/backend/nodejs). If you're creating a new API, go ahead and Enable RBAC, Add Permissions in the Access Token, and Allow Offline Access. 
