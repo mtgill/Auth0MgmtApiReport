@@ -20,7 +20,24 @@
   <% reports.forEach(report => { %>
     <tr>
       <% Object.keys(report).forEach(k => { %>
-        <td><%= report[k] %></td>
+        <% if(report.actions.length && k === 'actions') {%>
+          <td>
+            <table>
+          <% Object.keys(report.actions).forEach(i => { %>
+            <% console.log(report.actions); %>
+            <tr>
+              <td>
+                <p>Name: <%= report.actions[i].name %></p>
+                <p>ID: <%= report.actions[i].id %></p>
+                <p>Trigger: <%= report.actions[i].trigger %></p>
+              </td>
+            </tr>
+          <% }); %>
+            </table>
+          </td>
+        <% } else { %>
+            <td><%= report[k] %></td>
+        <% } %>
       <% }) %>
     </tr>
   <% }) %>

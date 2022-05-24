@@ -77,7 +77,7 @@ app.get('/', authorizeAccessToken, async (req, res) => {
     for (let i = 0; i < actions.total; i++){
       clientObjList.forEach(client => {
         if (actions.actions[i].code.includes(client.id)){
-          client.actions.push(actions.actions[i].name, actions.actions[i].id, actions.actions[i].supported_triggers[0].id);
+          client.actions.push({name: actions.actions[i].name, id: actions.actions[i].id, trigger: actions.actions[i].supported_triggers[0].id});
         }
       })
     }
